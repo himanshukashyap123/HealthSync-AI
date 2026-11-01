@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="HealthSync AI - Paste your medical lab report and get a plain-language summary, disease detection, and doctor-ready health report. Personal health portal with sign-in.">
+  <title>HealthSync AI - Medical Report Analyzer &amp; Health Portal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;family=Outfit:wght@400;500;600;700;800;900&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.2/anime.min.js"></script>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div id="auth-screen" class="auth-screen">
+    <div class="auth-bg">
+      <div class="particle" id="p1"></div><div class="particle" id="p2"></div>
+      <div class="particle" id="p3"></div><div class="particle" id="p4"></div>
+      <div class="particle" id="p5"></div><div class="particle" id="p6"></div>
+      <div class="grid-overlay"></div>
+    </div>
+    <div class="auth-card" id="auth-card">
+      <div class="auth-logo">
+        <div class="auth-logo-icon"><i class="fa-solid fa-microscope"></i></div>
+        <div>
+          <h1 class="auth-brand">HealthSync AI</h1>
+          <p class="auth-tagline">Medical Report Intelligence</p>
+        </div>
+      </div>
+      <div class="auth-tabs">
+        <button class="auth-tab active" id="signin-tab-btn" onclick="switchAuthTab('signin')">Sign In</button>
+        <button class="auth-tab" id="signup-tab-btn" onclick="switchAuthTab('signup')">Create Account</button>
+      </div>
+      <form id="signin-form" class="auth-form" onsubmit="handleSignIn(event)">
+        <div class="auth-field">
+          <label><i class="fa-solid fa-envelope"></i> Email Address</label>
+          <input type="email" id="signin-email" placeholder="doctor@hospital.com" required>
+        </div>
+        <div class="auth-field">
+          <label><i class="fa-solid fa-lock"></i> Password</label>
+          <div class="pass-wrap">
+            <input type="password" id="signin-pass" placeholder="Enter your password" required>
+            <button type="button" class="pass-toggle" onclick="togglePass('signin-pass',this)"><i class="fa-solid fa-eye"></i></button>
+          </div>
+        </div>
+        <div class="auth-options">
+          <label class="remember-check"><input type="checkbox" id="remember-me"> Remember me</label>
+          <a href="#" class="forgot-link">Forgot password?</a>
+        </div>
+        <button type="submit" class="btn-auth" id="signin-btn"><i class="fa-solid fa-right-to-bracket"></i> Sign In to Portal</button>
+        <div class="auth-divider"><span>or</span></div>
+        <button type="button" class="btn-demo" onclick="handleDemoLogin()"><i class="fa-solid fa-flask"></i> Try Demo Account</button>
+      </form>
+      <form id="signup-form" class="auth-form" style="display:none;" onsubmit="handleSignUp(event)">
+        <div class="form-row-2">
+          <div class="auth-field">
+            <label><i class="fa-solid fa-user"></i> First Name</label>
+            <input type="text" id="signup-fname" placeholder="John" required>
+          </div>
+          <div class="auth-field">
+            <label><i class="fa-solid fa-user"></i> Last Name</label>
+            <input type="text" id="signup-lname" placeholder="Doe" required>
+          </div>
+        </div>
+        <div class="auth-field">
+          <label><i class="fa-solid fa-envelope"></i> Email</label>
+          <input type="email" id="signup-email" placeholder="your@email.com" required>
+        </div>
+        <div class="auth-field">
+          <label><i class="fa-solid fa-cake-candles"></i> Age</label>
+          <input type="number" id="signup-age" min="1" max="120" placeholder="28" required>
+        </div>
+        <div class="auth-field">
+          <label><i class="fa-solid fa-lock"></i> Password</label>
+          <div class="pass-wrap">
+            <input type="password" id="signup-pass" placeholder="Create a strong password" required>
+            <button type="button" class="pass-toggle" onclick="togglePass('signup-pass',this)"><i class="fa-solid fa-eye"></i></button>
+          </div>
+        </div>
+        <button type="submit" class="btn-auth" id="signup-btn"><i class="fa-solid fa-user-plus"></i> Create My Health Portal</button>
+      </form>
+      <p class="auth-disclaimer"><i class="fa-solid fa-shield-halved"></i> Your data is stored securely. We never share your medical info.</p>
+    </div>
+  </div>
+
+  <div id="main-app" class="main-app" style="display:none;">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-logo">
+        <div class="sidebar-logo-icon"><i class="fa-solid fa-microscope"></i></div>
+        <div class="sidebar-brand"><span class="brand-name">HealthSync</span><span class="brand-tag">AI</span></div>
+      </div>
+      <nav class="sidebar-nav">
+        <button class="nav-item active" id="nav-dashboard" onclick="navigateTo('dashboard')"><i class="fa-solid fa-gauge-high"></i><span>Dashboard</span></button>
+        <button class="nav-item" id="nav-analyzer" onclick="navigateTo('analyzer')"><i class="fa-solid fa-file-waveform"></i><span>Report Analyzer</span><span class="nav-badge">AI</span></button>
+        <button class="nav-item" id="nav-bodymodel" onclick="navigateTo('bodymodel')"><i class="fa-solid fa-person"></i><span>3D Body Model</span><span class="nav-badge">3D</span></button>
+        <button class="nav-item" id="nav-insights" onclick="navigateTo('insights')"><i class="fa-solid fa-stethoscope"></i><span>Organ Insights</span></button>
+        <button class="nav-item" id="nav-history" onclick="navigateTo('history')"><i class="fa-solid fa-clock-rotate-left"></i><span>Report History</span></button>
+        <button class="nav-item" id="nav-profile" onclick="navigateTo('profile')"><i class="fa-solid fa-user-circle"></i><span>My Profile</span></button>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="user-pill">
+          <div class="user-avatar" id="sidebar-avatar">JD</div>
+          <div class="user-info"><span class="user-name" id="sidebar-name">John Doe</span><span class="user-role">Patient Portal</span></div>
+        </div>
+        <button class="signout-btn" onclick="handleSignOut()" title="Sign Out"><i class="fa-solid fa-arrow-right-from-bracket"></i></button>
+      </div>
+    </aside>
+
+    <main class="content-area">
+      <header class="topbar">
+        <div class="topbar-left">
+          <h2 class="page-title" id="page-title">Dashboard</h2>
+          <span class="page-subtitle" id="page-subtitle">Welcome back to your health portal</span>
+        </div>
+        <div class="topbar-right">
+          <div class="topbar-date"><i class="fa-solid fa-calendar-days"></i><span id="topbar-date-val"></span></div>
+          <label class="theme-switch" title="Toggle Theme">
+            <input type="checkbox" id="theme-toggle" onchange="toggleTheme(this)">
+            <span class="theme-slider"><i class="fa-solid fa-sun"></i><i class="fa-solid fa-moon"></i></span>
+          </label>
+          <div class="alert-bell" id="alert-bell" onclick="toggleAlertPanel()" title="Health Alerts">
+            <i class="fa-solid fa-bell"></i>
+            <span class="bell-dot" id="bell-dot" style="display:none;"></span>
+          </div>
+        </div>
+      </header>
+
+      <div class="alert-panel" id="alert-panel" style="display:none;">
+        <div class="alert-panel-header"><span><i class="fa-solid fa-triangle-exclamation"></i> Health Alerts</span><button onclick="toggleAlertPanel()"><i class="fa-solid fa-xmark"></i></button></div>
+        <div class="alert-panel-body" id="alert-panel-body"><p class="no-alerts">No alerts yet. Analyze a report to detect issues.</p></div>
+      </div>
+
+      <section class="page" id="page-dashboard">
+        <div class="welcome-hero" id="welcome-hero">
+          <div class="hero-text">
+            <h3 id="hero-greeting">Good Day,</h3>
+            <h2 id="hero-name">John Doe</h2>
+            <p id="hero-subtitle">Upload or paste your medical lab report to get instant AI-powered analysis in plain English.</p>
+            <button class="btn-hero" onclick="navigateTo('analyzer')"><i class="fa-solid fa-file-medical"></i> Analyze a Report Now</button>
+          </div>
+          <div class="hero-visual">
+            <div class="hero-rings" id="hero-rings">
+              <div class="ring ring1"></div>
+              <div class="ring ring2"></div>
+              <div class="ring ring3"></div>
+              <div class="ring-center"><i class="fa-solid fa-dna"></i></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="stats-row" id="stats-row">
+          <div class="stat-card" id="stat-reports">
+            <div class="stat-icon" style="background:linear-gradient(135deg,#6366f1,#8b5cf6)"><i class="fa-solid fa-file-medical"></i></div>
+            <div class="stat-info"><span class="stat-number" id="stat-reports-val">0</span><span class="stat-label">Reports Analyzed</span></div>
+          </div>
+          <div class="stat-card" id="stat-alerts-card">
+            <div class="stat-icon" style="background:linear-gradient(135deg,#ef4444,#f97316)"><i class="fa-solid fa-triangle-exclamation"></i></div>
+            <div class="stat-info"><span class="stat-number" id="stat-alerts-val">0</span><span class="stat-label">Active Alerts</span></div>
+          </div>
+          <div class="stat-card" id="stat-conditions">
+            <div class="stat-icon" style="background:linear-gradient(135deg,#06b6d4,#0ea5e9)"><i class="fa-solid fa-virus"></i></div>
+            <div class="stat-info"><span class="stat-number" id="stat-conditions-val">0</span><span class="stat-label">Flagged Conditions</span></div>
+          </div>
+          <div class="stat-card" id="stat-score">
+            <div class="stat-icon" style="background:linear-gradient(135deg,#22c55e,#16a34a)"><i class="fa-solid fa-heart-pulse"></i></div>
+            <div class="stat-info"><span class="stat-number" id="stat-score-val">--</span><span class="stat-label">Health Score</span></div>
+          </div>
+        </div>
+
+        <div class="section-card">
+          <div class="section-header">
+            <h3><i class="fa-solid fa-clock-rotate-left"></i> Recent Reports</h3>
+            <button class="btn-sm" onclick="navigateTo('analyzer')"><i class="fa-solid fa-plus"></i> New Report</button>
+          </div>
+          <div id="recent-reports-list" class="recent-reports-list">
+            <div class="empty-placeholder">
+              <i class="fa-solid fa-file-circle-plus"></i>
+              <p>No reports yet. Start by analyzing your first medical report.</p>
+              <button class="btn-start" onclick="navigateTo('analyzer')">Get Started</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="how-it-works">
+          <h3 class="how-title"><i class="fa-solid fa-circle-info"></i> How HealthSync AI Works</h3>
+          <div class="how-steps">
+            <div class="how-step"><div class="step-num">01</div><div class="step-icon"><i class="fa-solid fa-paste"></i></div><h4>Paste Your Report</h4><p>Copy the text from your lab report and paste it into our analyzer.</p></div>
+            <div class="step-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+            <div class="how-step"><div class="step-num">02</div><div class="step-icon"><i class="fa-solid fa-brain"></i></div><h4>AI Analysis</h4><p>Our AI reads every value — CBC, LFT, KFT, lipid, thyroid, diabetes &amp; more.</p></div>
+            <div class="step-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+            <div class="how-step"><div class="step-num">03</div><div class="step-icon"><i class="fa-solid fa-file-prescription"></i></div><h4>Plain Summary</h4><p>Get a jargon-free summary — what's normal, what needs attention, and why.</p></div>
+            <div class="step-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+            <div class="how-step"><div class="step-num">04</div><div class="step-icon"><i class="fa-solid fa-stethoscope"></i></div><h4>Doctor-Ready</h4><p>Download or print a structured report to bring to your doctor.</p></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="page" id="page-analyzer" style="display:none;">
+        <div class="analyzer-layout">
+          <div class="analyzer-input-panel">
+            <div class="input-panel-header">
+              <div class="input-panel-icon"><i class="fa-solid fa-paste"></i></div>
+              <div><h3>Paste Your Medical Report</h3><p>Copy text from any lab report and paste below. AI auto-detects all values.</p></div>
+            </div>
+            <div class="quick-fields">
+              <div class="quick-field">
+                <label>Patient Name (optional)</label>
+                <input type="text" id="report-name" placeholder="As shown on report">
+              </div>
+              <div class="quick-field">
+                <label>Report Type</label>
+                <select id="report-type">
+                  <option value="auto">Auto Detect</option>
+                  <option value="cbc">CBC (Blood Count)</option>
+                  <option value="lft">Liver Function (LFT)</option>
+                  <option value="kft">Kidney Function (KFT)</option>
+                  <option value="lipid">Lipid Profile</option>
+                  <option value="thyroid">Thyroid Panel</option>
+                  <option value="diabetes">Diabetes Panel</option>
+                  <option value="urine">Urine Analysis</option>
+                  <option value="full">Full Body Checkup</option>
+                  <option value="cardiac">Cardiac Markers</option>
+                  <option value="vitamin">Vitamins &amp; Minerals</option>
+                  <option value="general">General Report</option>
+                </select>
+              </div>
+            </div>
+            <div class="input-tabs">
+              <button class="itab active" id="itab-text" onclick="setInputMode('text')"><i class="fa-solid fa-keyboard"></i> Type / Paste</button>
+              <button class="itab" id="itab-file" onclick="setInputMode('file')"><i class="fa-solid fa-file-arrow-up"></i> Image / Document</button>
+            </div>
+            <div class="dropzone" id="dropzone" style="display:none;" onclick="document.getElementById('file-input').click()">
+              <input type="file" id="file-input" hidden accept="image/*,.pdf,.docx,.txt,.csv" onchange="handleFileSelect(this.files[0])">
+              <i class="fa-solid fa-cloud-arrow-up"></i>
+              <h4>Drop your report here</h4>
+              <p>Photo or scan (JPG, PNG), PDF, Word (.docx) or text file</p>
+              <small>Read inside your browser - nothing is uploaded</small>
+              <div class="file-status" id="file-status"></div>
+            </div>
+            <div class="report-textarea-container" id="text-container">
+              <textarea id="report-text-input" class="report-textarea" placeholder="Paste your full lab report text here...
+
+Example:
+COMPLETE BLOOD COUNT (CBC)
+Haemoglobin: 9.2 g/dL   (Normal: 13.0-17.0)
+WBC Count: 11,500 /µL   (Normal: 4000-11000)
+Platelet Count: 82,000   (Normal: 150,000-400,000)
+
+LIVER FUNCTION TEST
+SGPT/ALT: 89 U/L   (Normal: 7-56)
+Total Bilirubin: 2.8 mg/dL   (Normal: 0.2-1.2)
+
+Our AI will read every value and explain it in plain English!"></textarea>
+              <div class="textarea-actions">
+                <button class="ta-action-btn" onclick="clearReportText()"><i class="fa-solid fa-trash"></i> Clear</button>
+                <button class="ta-action-btn" onclick="loadSampleReport()"><i class="fa-solid fa-vial"></i> Load Sample</button>
+              </div>
+            </div>
+            <button class="btn-analyze" id="btn-analyze" onclick="analyzeReport()">
+              <span class="btn-analyze-inner"><i class="fa-solid fa-brain"></i><span>Analyze My Report</span></span>
+              <div class="btn-scan-line"></div>
+            </button>
+            <div class="analyze-progress" id="analyze-progress" style="display:none;">
+              <div class="progress-label" id="progress-label">Scanning report values...</div>
+              <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+              <div class="progress-steps">
+                <span class="pstep active" id="pstep-1">Reading</span>
+                <span class="pstep" id="pstep-2">Parsing</span>
+                <span class="pstep" id="pstep-3">Analyzing</span>
+                <span class="pstep" id="pstep-4">Generating</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="analyzer-results-panel" id="analyzer-results-panel">
+            <div class="results-empty" id="results-empty">
+              <div class="results-empty-icon"><i class="fa-solid fa-microscope"></i></div>
+              <h3>Awaiting Your Report</h3>
+              <p>Paste your medical report text on the left and click "Analyze" to get your plain-language summary.</p>
+              <div class="supported-tests">
+                <span class="test-tag"><i class="fa-solid fa-check"></i> CBC</span>
+                <span class="test-tag"><i class="fa-solid fa-check"></i> LFT</span>
+                <span class="test-tag"><i class="fa-solid fa-check"></i> KFT</span>
+                <span class="test-tag"><i class="fa-solid fa-check"></i> Lipid</span>
+                <span class="test-tag"><i class="fa-solid fa-check"></i> Thyroid</span>
+                <span class="test-tag"><i class="fa-solid fa-check"></i> Diabetes</span>
+                <span class="test-tag"><i class="fa-solid fa-check"></i> Cardiac</span>
+                <span class="test-tag"><i class="fa-solid fa-check"></i> Vitamins</span>
+                <span class="test-tag"><i class="fa-solid fa-check"></i> Urine</span>
+                <span class="test-tag"><i class="fa-solid fa-check"></i> +More</span>
+              </div>
+            </div>
+            <div id="results-content" style="display:none;"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="page" id="page-bodymodel" style="display:none;">
+        <div class="section-card bm3d-card">
+          <div class="section-header">
+            <h3><i class="fa-solid fa-person"></i> Interactive 3D Body Model</h3>
+            <div class="bm3d-tools">
+              <button class="btn-sm" onclick="bm3dToggleSpin()"><i class="fa-solid fa-rotate"></i> Auto-rotate</button>
+              <button class="btn-sm" onclick="bm3dReset()"><i class="fa-solid fa-crosshairs"></i> Reset</button>
+            </div>
+          </div>
+          <div class="bm3d-stage">
+            <div id="body3d"></div>
+            <div class="bm3d-hint">Drag to rotate &middot; scroll to zoom &middot; click an organ</div>
+            <div class="bm3d-info" id="bm3d-info"></div>
+          </div>
+          <div class="bm-chips" id="bm3d-chips"></div>
+        </div>
+      </section>
+
+      <section class="page" id="page-insights" style="display:none;">
+        <div class="insights-layout">
+          <div class="insights-list" id="insights-list"></div>
+          <div class="insights-detail" id="insights-detail"></div>
+        </div>
+      </section>
+
+      <section class="page" id="page-history" style="display:none;">
+        <div class="section-card">
+          <div class="section-header">
+            <h3><i class="fa-solid fa-clock-rotate-left"></i> All Report History</h3>
+            <button class="btn-sm btn-danger-sm" onclick="clearHistory()"><i class="fa-solid fa-trash"></i> Clear All</button>
+          </div>
+          <div id="history-list" class="history-list">
+            <div class="empty-placeholder">
+              <i class="fa-solid fa-folder-open"></i>
+              <p>No report history yet. Analyze a report to build your health timeline.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="page" id="page-profile" style="display:none;">
+        <div class="profile-layout">
+          <div class="profile-card">
+            <div class="profile-avatar-big" id="profile-avatar-big">JD</div>
+            <h3 id="profile-full-name">John Doe</h3>
+            <p id="profile-email-display" class="profile-email">john@example.com</p>
+            <span class="profile-badge"><i class="fa-solid fa-shield-halved"></i> Verified Account</span>
+          </div>
+          <div class="profile-info-card">
+            <h4><i class="fa-solid fa-id-card"></i> Account Details</h4>
+            <div class="profile-fields">
+              <div class="profile-field"><label>Full Name</label><span id="pf-name"></span></div>
+              <div class="profile-field"><label>Email</label><span id="pf-email"></span></div>
+              <div class="profile-field"><label>Age</label><span id="pf-age"></span></div>
+              <div class="profile-field"><label>Member Since</label><span id="pf-joined"></span></div>
+              <div class="profile-field"><label>Total Reports</label><span id="pf-reports"></span></div>
+            </div>
+            <button class="btn-signout-big" onclick="handleSignOut()"><i class="fa-solid fa-arrow-right-from-bracket"></i> Sign Out</button>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <div class="toast" id="toast">
+    <i class="toast-icon fa-solid fa-circle-check"></i>
+    <span class="toast-msg" id="toast-msg">Done!</span>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tesseract.js/5.0.4/tesseract.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
